@@ -5,10 +5,20 @@ import PackageDescription
 
 let package = Package(
     name: "zenzai-skkserv",
+    platforms: [
+        .macOS(.v14)
+    ],
+    dependencies: [
+        .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0")
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(
-            name: "zenzai-skkserv"),
+            name: "zenzai-skkserv",
+            dependencies: [
+                .product(name: "Hummingbird", package: "hummingbird")
+            ]
+        )
     ]
 )
