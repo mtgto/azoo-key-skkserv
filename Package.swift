@@ -9,6 +9,8 @@ let package = Package(
         .macOS(.v14)
     ],
     dependencies: [
+        // TODO: 0.8.0にしたいが, ビルド通らなかったので一旦0.7.0で検証
+        .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", from: "0.7.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0")
     ],
     targets: [
@@ -17,6 +19,7 @@ let package = Package(
         .executableTarget(
             name: "zenzai-skkserv",
             dependencies: [
+                .product(name: "KanaKanjiConverterModuleWithDefaultDictionary", package: "AzooKeyKanaKanjiConverter"),
                 .product(name: "Hummingbird", package: "hummingbird")
             ]
         )

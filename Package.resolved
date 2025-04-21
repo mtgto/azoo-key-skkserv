@@ -1,5 +1,5 @@
 {
-  "originHash" : "30093cb94abc29df3f2fa4808eb21790070258ecaa65ae4c6836fae3c12843b0",
+  "originHash" : "6add71597934634996922b5c11e61cff00c23c856473a7759efcd4817173fb79",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "333f51104b75d1a5b94cb3b99e4c58a3b442c9f7",
         "version" : "1.25.2"
+      }
+    },
+    {
+      "identity" : "azookeykanakanjiconverter",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/azooKey/AzooKeyKanaKanjiConverter",
+      "state" : {
+        "revision" : "b5f634f45e14e95d11de181e1a8d122293be720b",
+        "version" : "0.7.0"
       }
     },
     {
