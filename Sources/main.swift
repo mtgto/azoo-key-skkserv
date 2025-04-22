@@ -51,7 +51,7 @@ func receive(on connection: NWConnection) {
             case "0":
                 connection.cancel()
             case "1":
-                let yomi = String(message.suffix(message.count - 1))
+                let yomi = String(message.suffix(message.count - 1)).trimmingCharacters(in: .whitespacesAndNewlines)
                 var composingText = ComposingText()
                 composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
                 Task {
@@ -61,9 +61,9 @@ func receive(on connection: NWConnection) {
                         ? "4\n"
                         : "1/"
                             + results.mainResults
-                                // 読み全文に対応するもの以外は除去
-                                .filter({ result in result.correspondingCount == yomi.count })
-                                .map({ result in result.text.trimmingCharacters(in: .whitespacesAndNewlines) })
+                                // 読み全文に対応するもの以外・読みと完全一致するものは除去
+                                .filter({ result in result.correspondingCount == yomi.count && result.text != yomi })
+                                .map({ result in result.text })
                                 .joined(by: "/")
                             + "/\n"
 
