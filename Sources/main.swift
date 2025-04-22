@@ -24,7 +24,7 @@ func send(on connection: NWConnection, message: String) {
 }
 
 func receive(on connection: NWConnection) {
-    connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { data, context, isComplete, error in
+    connection.receive(minimumIncompleteLength: 1, maximumLength: 1024) { data, context, isComplete, error in
         if let data = data, !data.isEmpty, let message = String(data: data, encoding: .japaneseEUC) {
             print("Received: \(message)")
 
