@@ -6,6 +6,21 @@ import KanaKanjiConverterModuleWithDefaultDictionary
 
 let converter = KanaKanjiConverter()
 
+let convertOption = ConvertRequestOptions.withDefaultDictionary(
+    // 日本語予測変換
+    requireJapanesePrediction: false,
+    // 英語予測変換 
+    requireEnglishPrediction: false,
+    // 入力言語 
+    keyboardLanguage: .ja_JP,
+    // 学習タイプ 
+    learningType: .nothing, 
+    // TODO: 扱いについて検討
+    memoryDirectoryURL: URL(fileURLWithPath: ""),
+    sharedContainerURL: URL(fileURLWithPath: ""),
+    metadata: .init(versionString: "0.0.1")
+)
+
 func getPort() -> NWEndpoint.Port {
     if CommandLine.arguments.count == 2 {
         if let port = NWEndpoint.Port(CommandLine.arguments[1]) {
@@ -40,20 +55,7 @@ func receive(on connection: NWConnection) {
                 var composingText = ComposingText()
                 composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
                 Task {
-                    let results = await converter.requestCandidates(composingText, options: .withDefaultDictionary(
-                        // 日本語予測変換
-                        requireJapanesePrediction: false,
-                        // 英語予測変換 
-                        requireEnglishPrediction: false,
-                        // 入力言語 
-                        keyboardLanguage: .ja_JP,
-                        // 学習タイプ 
-                        learningType: .nothing, 
-                        // TODO: 扱いについて検討
-                        memoryDirectoryURL: URL(fileURLWithPath: ""),
-                        sharedContainerURL: URL(fileURLWithPath: ""),
-                        metadata: .init(appVersionString: "0.0.1")
-                    ))
+                    let results = await converter.requestCandidates(composingText, options: convertOption)
 
                     let content = results.mainResults.count == 0
                         ? "4\n"

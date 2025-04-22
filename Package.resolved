@@ -1,13 +1,21 @@
 {
-  "originHash" : "bf00e6859258433ef9176af560237da7dc9a524626a4075fc3ddcdca0839abf1",
+  "originHash" : "35881b1a8baf1206dd0f64bc1db84f5a0ee180d9fb830c5f1975d35f53c94146",
   "pins" : [
     {
       "identity" : "azookeykanakanjiconverter",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/azooKey/AzooKeyKanaKanjiConverter",
+      "location" : "https://github.com/gitusp/AzooKeyKanaKanjiConverter",
       "state" : {
-        "revision" : "b5f634f45e14e95d11de181e1a8d122293be720b",
-        "version" : "0.7.0"
+        "revision" : "2cde22d3e2dd67244f7b095e092f23892dd4d566"
+      }
+    },
+    {
+      "identity" : "jinja",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/johnmai-dev/Jinja",
+      "state" : {
+        "revision" : "bbddb92fc51ae420b87300298370fd1dfc308f73",
+        "version" : "1.1.1"
       }
     },
     {
@@ -20,12 +28,38 @@
       }
     },
     {
+      "identity" : "swift-collections",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-collections.git",
+      "state" : {
+        "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
+        "version" : "1.1.4"
+      }
+    },
+    {
       "identity" : "swift-numerics",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-numerics.git",
       "state" : {
         "revision" : "e0ec0f5f3af6f3e4d5e7a19d2af26b481acb6ba8",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "swift-tokenizers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ensan-hcl/swift-tokenizers",
+      "state" : {
+        "branch" : "feat/minimum",
+        "revision" : "407e51806c0c3354a9045f23859ed1704114e514"
+      }
+    },
+    {
+      "identity" : "swiftymarisa",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ensan-hcl/SwiftyMarisa",
+      "state" : {
+        "revision" : "6e145aef5583aac96dd7ff8f9fbb9944d893128e"
       }
     }
   ],
