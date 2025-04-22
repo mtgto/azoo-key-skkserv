@@ -17,6 +17,21 @@ azoo-key-skkserv
 
 TODO:
 
+## インストール
+
+ソースコードからビルドする必要があります。
+
+```sh
+# リポジトリをクローンしてビルド
+git clone git@github.com:gitusp/azoo-key-skkserv.git
+cd azoo-key-skkserv
+swift build -c release
+
+# お好きなところに配置してください
+cp -r .build/arm64-apple-macosx/release ~/opt/azoo-key-skkserve
+ln -s ~/opt/azoo-key-skkserve/azoo-key-skkserv ~/bin/azoo-key-skkserv
+```
+
 ## 使い方
 
 ```sh
@@ -43,18 +58,10 @@ nohup azoo-key-skkserv [port] >&/dev/null &
 
 TODO: 基本的にはskkservの標準に準拠
 
-## ビルド
-
-### 開発
+## 開発
 
 ```sh
 swift run azoo-key-skkserve
-```
-
-### リリース
-
-```sh
-swift build -c release
 ```
 
 ## 動作検証環境
@@ -64,6 +71,7 @@ swift build -c release
 ## TODO
 
 - [x] PoC
-- [ ] Zenzaiの導入
 - [ ] ネットワークサンドボックス
+- [ ] こまごまとした環境整備など
 - [ ] バイナリ配布
+- [ ] Zenzaiの導入
