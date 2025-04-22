@@ -1,3 +1,4 @@
+import Foundation
 import Network
 import KanaKanjiConverterModuleWithDefaultDictionary
 
@@ -6,7 +7,14 @@ let converter = KanaKanjiConverter()
 // TODO: args
 let port = NWEndpoint.Port(1178)
 
-// Receive data on the connection, echo back, and continue receiving
+func send(on connection: NWConnection, message: String) {
+    connection.send(content: message.data(using: .utf8), completion: .contentProcessed { sendError in
+        if let error = sendError {
+            print("Send error:", error)
+        }
+    })
+}
+
 func receive(on connection: NWConnection) {
     connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { data, context, isComplete, error in
         if let data = data, !data.isEmpty, let message = String(data: data, encoding: .japaneseEUC) {
@@ -15,42 +23,46 @@ func receive(on connection: NWConnection) {
             let opcode = message.prefix(1)
 
             switch (opcode) {
-                case "1":
-                    let yomi = String(message.suffix(message.count - 1))
-                    var composingText = ComposingText()
-                    composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
-                    Task {
-                        let results = await converter.requestCandidates(composingText, options: .withDefaultDictionary(
-                            // 日本語予測変換
-                            requireJapanesePrediction: false,
-                            // 英語予測変換 
-                            requireEnglishPrediction: false,
-                            // 入力言語 
-                            keyboardLanguage: .ja_JP,
-                            // 学習タイプ 
-                            learningType: .nothing, 
-                            // TODO: 学習データを保存するディレクトリのURL（書類フォルダを指定）
-                            memoryDirectoryURL: .documentsDirectory, 
-                            // TODO: ユーザ辞書データのあるディレクトリのURL（書類フォルダを指定）
-                            sharedContainerURL: .documentsDirectory,
-                            // TODO: メタデータ
-                            metadata: .init(appVersionString: "0.0.1")
-                        ))
+            case "0":
+                connection.cancel()
+            case "1":
+                let yomi = String(message.suffix(message.count - 1))
+                var composingText = ComposingText()
+                composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
+                Task {
+                    let results = await converter.requestCandidates(composingText, options: .withDefaultDictionary(
+                        // 日本語予測変換
+                        requireJapanesePrediction: false,
+                        // 英語予測変換 
+                        requireEnglishPrediction: false,
+                        // 入力言語 
+                        keyboardLanguage: .ja_JP,
+                        // 学習タイプ 
+                        learningType: .nothing, 
+                        // TODO: 学習データを保存するディレクトリのURL（書類フォルダを指定）
+                        memoryDirectoryURL: .documentsDirectory, 
+                        // TODO: ユーザ辞書データのあるディレクトリのURL（書類フォルダを指定）
+                        sharedContainerURL: .documentsDirectory,
+                        // TODO: メタデータ
+                        metadata: .init(appVersionString: "0.0.1")
+                    ))
 
-                        let content = (results.mainResults.first.map({ result in
-                            "1/" + result.text.trimmingCharacters(in: .whitespacesAndNewlines) + "/"
-                        }) ?? "4") + "\n"
+                    let content = (results.mainResults.first.map({ result in
+                        "1/" + result.text.trimmingCharacters(in: .whitespacesAndNewlines) + "/"
+                    }) ?? "4") + "\n"
 
-                        connection.send(content: content.data(using: .utf8), completion: .contentProcessed { sendError in
-                            if let error = sendError {
-                                print("Send error:", error)
-                            }
-                        })
-                    }
-                default:
-                    break;
+                    send(on: connection, message: content)
+                }
+            case "2":
+                send(on: connection, message: "azoo-key-skkserve/0.0.1 ")
+            case "3":
+                let host = Host.current().localizedName ?? ""
+                send(on: connection, message: host + "/127.0.0.1:1178/ " )
+            case "4":
+                send(on: connection, message: "4\n" )
+            default:
+                break;
             }
-
         }
         if let error = error {
             print("Receive error:", error)
@@ -64,7 +76,6 @@ func receive(on connection: NWConnection) {
     }
 }
 
-// Handle a new incoming connection
 func handleConnection(_ connection: NWConnection) {
     connection.stateUpdateHandler = { state in
         switch state {
@@ -84,7 +95,6 @@ func handleConnection(_ connection: NWConnection) {
 }
 
 do {
-    // Create a TCP listener on the specified port
     let listener = try NWListener(using: .tcp, on: port)
 
     listener.newConnectionHandler = { connection in
