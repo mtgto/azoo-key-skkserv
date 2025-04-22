@@ -38,11 +38,13 @@ azoo-key-skkserv [port]
 
 ### バックグラウンド実行
 
+私はmacOSのAutomatorで以下のshellを実行するアプリケーションを作成しています。
+
 ```sh
-nohup azoo-key-skkserv [port] >&/dev/null &
+nohup azoo-key-skkserv >&/dev/null &
 ```
 
-など
+作成したアプリケーションはログイン項目に登録しておき、自動的にサーバーが立ち上がるようにしています。
 
 ## 仕様
 
@@ -73,9 +75,15 @@ swift run azoo-key-skkserve
 
 [macSKK](https://github.com/mtgto/macSKK)
 
-## TODO
+## やりたいこと等
 
 - [x] PoC
-- [ ] バイナリ配布
+- [ ] homebrew等でバイナリ配布
 - [ ] ネットワークサンドボックス
+    - 見出し語の入力がどこにも送信されないことを保証したい
+    - SKKにはTCPで通信できる必要があり、リモートへの通信のみ制限することができるのか？
+    - 詳しい方いたら教えてください🙏
+- [ ] 設定ファイルで挙動を変えられるように
 - [ ] Zenzaiの試験導入
+    - ビルド周りで手こずってしまって一旦ペンディング
+    - SKKで長文を食わせることもあまりないような気もするけれど、体験してみたい気もする。
