@@ -3,43 +3,54 @@ import KanaKanjiConverterModuleWithDefaultDictionary
 
 let converter = KanaKanjiConverter()
 
-// TODO: skkservの仕様に合わせる
-let port = NWEndpoint.Port(8080)
+// TODO: args
+let port = NWEndpoint.Port(1178)
 
 // Receive data on the connection, echo back, and continue receiving
 func receive(on connection: NWConnection) {
     connection.receive(minimumIncompleteLength: 1, maximumLength: 65536) { data, context, isComplete, error in
-        if let data = data, !data.isEmpty {
-            let message = String(decoding: data, as: UTF8.self)
+        if let data = data, !data.isEmpty, let message = String(data: data, encoding: .japaneseEUC) {
             print("Received: \(message)")
 
-            var c = ComposingText()
-            c.insertAtCursorPosition(message, inputStyle: .direct)
-            Task {
-                let results = await converter.requestCandidates(c, options: .withDefaultDictionary(
-                    // 日本語予測変換
-                    requireJapanesePrediction: false,
-                    // 英語予測変換 
-                    requireEnglishPrediction: false,
-                    // 入力言語 
-                    keyboardLanguage: .ja_JP,
-                    // 学習タイプ 
-                    learningType: .nothing, 
-                    // TODO: 設定できるように
-                    // 学習データを保存するディレクトリのURL（書類フォルダを指定）
-                    memoryDirectoryURL: .documentsDirectory, 
-                    // ユーザ辞書データのあるディレクトリのURL（書類フォルダを指定）
-                    sharedContainerURL: .documentsDirectory, 
-                    // メタデータ
-                    metadata: .init(appVersionString: "0.0.1")
-                ))
+            let opcode = message.prefix(1)
 
-                connection.send(content: results.mainResults.first!.text.data(using: .utf8), completion: .contentProcessed { sendError in
-                    if let error = sendError {
-                        print("Send error:", error)
+            switch (opcode) {
+                case "1":
+                    let yomi = String(message.suffix(message.count - 1))
+                    var composingText = ComposingText()
+                    composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
+                    Task {
+                        let results = await converter.requestCandidates(composingText, options: .withDefaultDictionary(
+                            // 日本語予測変換
+                            requireJapanesePrediction: false,
+                            // 英語予測変換 
+                            requireEnglishPrediction: false,
+                            // 入力言語 
+                            keyboardLanguage: .ja_JP,
+                            // 学習タイプ 
+                            learningType: .nothing, 
+                            // TODO: 学習データを保存するディレクトリのURL（書類フォルダを指定）
+                            memoryDirectoryURL: .documentsDirectory, 
+                            // TODO: ユーザ辞書データのあるディレクトリのURL（書類フォルダを指定）
+                            sharedContainerURL: .documentsDirectory,
+                            // TODO: メタデータ
+                            metadata: .init(appVersionString: "0.0.1")
+                        ))
+
+                        let content = (results.mainResults.first.map({ result in
+                            "1/" + result.text.trimmingCharacters(in: .whitespacesAndNewlines) + "/"
+                        }) ?? "4") + "\n"
+
+                        connection.send(content: content.data(using: .utf8), completion: .contentProcessed { sendError in
+                            if let error = sendError {
+                                print("Send error:", error)
+                            }
+                        })
                     }
-                })
+                default:
+                    break;
             }
+
         }
         if let error = error {
             print("Receive error:", error)
