@@ -4,8 +4,16 @@ import KanaKanjiConverterModuleWithDefaultDictionary
 
 let converter = KanaKanjiConverter()
 
-// TODO: args
-let port = NWEndpoint.Port(1178)
+func getPort() -> NWEndpoint.Port {
+    if CommandLine.arguments.count == 2 {
+        if let port = NWEndpoint.Port(CommandLine.arguments[1]) {
+            return port
+        }
+        print("Port argument is invalid. Falling back to default port.")
+    }
+
+    return NWEndpoint.Port(1178)
+}
 
 func send(on connection: NWConnection, message: String) {
     connection.send(content: message.data(using: .utf8), completion: .contentProcessed { sendError in
@@ -43,7 +51,6 @@ func receive(on connection: NWConnection) {
                         memoryDirectoryURL: .documentsDirectory, 
                         // TODO: ユーザ辞書データのあるディレクトリのURL（書類フォルダを指定）
                         sharedContainerURL: .documentsDirectory,
-                        // TODO: メタデータ
                         metadata: .init(appVersionString: "0.0.1")
                     ))
 
@@ -95,6 +102,7 @@ func handleConnection(_ connection: NWConnection) {
 }
 
 do {
+    let port = getPort()
     let listener = try NWListener(using: .tcp, on: port)
 
     listener.newConnectionHandler = { connection in
