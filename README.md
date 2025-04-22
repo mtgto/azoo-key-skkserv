@@ -1,9 +1,9 @@
-azoo-key-skkserve
+azoo-key-skkserv
 ===
 
 [AzooKeyKanaKanjiConverter](https://github.com/azooKey/AzooKeyKanaKanjiConverter)を変換に利用したskkservです。
 
-## 概要
+## azoo-key-skkservについて
 
 受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を返します。  
 これにより例えば:
@@ -17,7 +17,7 @@ azoo-key-skkserve
 
 TODO:
 
-### 使い方
+## 使い方
 
 ```sh
 azoo-key-skkserv [port]
@@ -25,13 +25,23 @@ azoo-key-skkserv [port]
 
 `port` を指定しない場合、デフォルトの `1178` が使用されます。
 
-#### バックグラウンド実行
+### バックグラウンド実行
 
 ```sh
 nohup azoo-key-skkserv [port] >&/dev/null &
 ```
 
 など
+
+## 仕様
+
+### 文字コード
+
+入力・出力どちらもEUC-JP
+
+### プロトコル
+
+TODO: 基本的にはskkservの標準に準拠
 
 ## ビルド
 

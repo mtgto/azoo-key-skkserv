@@ -33,7 +33,7 @@ func getPort() -> NWEndpoint.Port {
 }
 
 func send(on connection: NWConnection, message: String) {
-    connection.send(content: message.data(using: .utf8), completion: .contentProcessed { sendError in
+    connection.send(content: message.data(using: .japaneseEUC), completion: .contentProcessed { sendError in
         if let error = sendError {
             print("Send error:", error)
         }
