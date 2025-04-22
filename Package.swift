@@ -4,23 +4,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "zenzai-skkserv",
+    name: "azoo-key-skkserv",
     platforms: [
         .macOS(.v14)
     ],
     dependencies: [
         // TODO: 0.8.0にしたいが, ビルド通らなかったので一旦0.7.0で検証
-        .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", from: "0.7.0"),
-        .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0")
+        .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", from: "0.7.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .executableTarget(
-            name: "zenzai-skkserv",
+            name: "azoo-key-skkserv",
             dependencies: [
-                .product(name: "KanaKanjiConverterModuleWithDefaultDictionary", package: "AzooKeyKanaKanjiConverter"),
-                .product(name: "Hummingbird", package: "hummingbird")
+                .product(name: "KanaKanjiConverterModuleWithDefaultDictionary", package: "AzooKeyKanaKanjiConverter")
             ]
         )
     ]
