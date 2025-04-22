@@ -2,6 +2,8 @@ import Foundation
 import Network
 import KanaKanjiConverterModuleWithDefaultDictionary
 
+// TODO: stderrに出力を分けたい
+
 let converter = KanaKanjiConverter()
 
 func getPort() -> NWEndpoint.Port {
