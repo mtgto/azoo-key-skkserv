@@ -47,16 +47,21 @@ func receive(on connection: NWConnection) {
                         keyboardLanguage: .ja_JP,
                         // 学習タイプ 
                         learningType: .nothing, 
-                        // TODO: 学習データを保存するディレクトリのURL（書類フォルダを指定）
-                        memoryDirectoryURL: .documentsDirectory, 
-                        // TODO: ユーザ辞書データのあるディレクトリのURL（書類フォルダを指定）
-                        sharedContainerURL: .documentsDirectory,
+                        // TODO: 扱いについて検討
+                        memoryDirectoryURL: URL(fileURLWithPath: ""),
+                        sharedContainerURL: URL(fileURLWithPath: ""),
                         metadata: .init(appVersionString: "0.0.1")
                     ))
 
-                    let content = (results.mainResults.first.map({ result in
-                        "1/" + result.text.trimmingCharacters(in: .whitespacesAndNewlines) + "/"
-                    }) ?? "4") + "\n"
+                    let content = results.mainResults.count == 0
+                        ? "4\n"
+                        : "1/"
+                            + results.mainResults
+                                // 読み全文に対応するもの以外は除去
+                                .filter({ result in result.correspondingCount == yomi.count })
+                                .map({ result in result.text.trimmingCharacters(in: .whitespacesAndNewlines) })
+                                .joined(by: "/")
+                            + "/\n"
 
                     send(on: connection, message: content)
                 }
