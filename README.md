@@ -55,7 +55,7 @@ nohup ~/bin/azoo-key-skkserv >&/dev/null &
 
 ### プロトコル
 
-基本的にはskkservの標準に準拠しているつもりです。  
+skkservの標準に準拠しているつもりです。  
 入力の1文字目を `opcode` とし、それ以降を `operand` とした場合:
 
 | opcode | operand  | 説明             | 出力                                              |
