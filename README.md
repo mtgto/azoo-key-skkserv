@@ -6,7 +6,7 @@ azoo-key-skkserv
 
 ## azoo-key-skkservについて
 
-skkservとして受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を辞書として返します。  
+macOSで動作する、受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を辞書として返すskkservです。  
 これにより例えば:
 
 - `配達業者` などそれぞれの熟語は辞書に入っているけれど、繋がったものは登録されていないケースでも候補を表示できます。
@@ -16,17 +16,14 @@ skkservとして受け取った読みをAzooKeyKanaKanjiConverterで漢字変換
 
 ## インストール
 
-ソースコードからビルドする必要があります。
+[Releases](https://github.com/gitusp/azoo-key-skkserv/releases)よりUniversal binaryをダウンロードしてください。  
+その後、解凍されたパッケージをお好きなところに配置してください。
+
+私は以下のような感じでホームディレクトリ配下に置いています。
 
 ```sh
-# リポジトリをクローンしてビルド
-git clone git@github.com:gitusp/azoo-key-skkserv.git
-cd azoo-key-skkserv
-swift build -c release
-
-# お好きなところに配置してください
-cp -r .build/arm64-apple-macosx/release ~/opt/azoo-key-skkserve
-ln -s ~/opt/azoo-key-skkserve/azoo-key-skkserv ~/bin/azoo-key-skkserv
+cp -r ~/Downloads/azoo-key-skkserve-0.0.1 ~/opt/azoo-key-skkserve-0.0.1
+ln -s ~/opt/azoo-key-skkserve/azoo-key-skkserv-0.0.1 ~/bin/azoo-key-skkserv
 ```
 
 ## 使い方
@@ -80,8 +77,7 @@ swift run azoo-key-skkserve
 
 - [x] PoC
 - [x] Zenzaiの導入
-- [ ] homebrew等でバイナリ配布
-- [ ] mac以外での動作確認やバイナリ配布
+- [ ] homebrewでバイナリ配布
 - [ ] ネットワークサンドボックス
     - 見出し語の入力がどこにも送信されないことを保証したい
     - SKKにはTCPで通信できる必要がある。リモートへの通信のみ制限することができるのか？
