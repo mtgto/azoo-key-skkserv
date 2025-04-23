@@ -26,8 +26,10 @@ let convertOption = ConvertRequestOptions.withDefaultDictionary(
     metadata: .init(versionString: "0.0.1")
 )
 
-// NOTE: 空のリクエストを送信して辞書を先読みしておく
-let _ = converter.requestCandidates(ComposingText(), options: convertOption)
+// HACK: ダミーリクエストを送信してモデルを先読みしておく
+var dummyComposingText = ComposingText()
+dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
+let _ = converter.requestCandidates(dummyComposingText, options: convertOption)
 
 func getPort() -> NWEndpoint.Port {
     if CommandLine.arguments.count == 2 {
