@@ -22,8 +22,8 @@ macOSで動作する、受け取った読みをAzooKeyKanaKanjiConverterで漢�
 私は以下のような感じでホームディレクトリ配下に置いています。
 
 ```sh
-mv ~/Downloads/azoo-key-skkserve-arm64-0.0.1 ~/opt
-ln -s ~/opt/azoo-key-skkserve-arm64-0.0.1/azoo-key-skkserv ~/bin/azoo-key-skkserv
+mv ~/Downloads/azoo-key-skkserve-arm64-0.0.2 ~/opt
+ln -s ~/opt/azoo-key-skkserve-arm64-0.0.2 ~/opt/azoo-key-skkserv
 ```
 
 ## 使い方
@@ -39,7 +39,7 @@ azoo-key-skkserv [port]
 私はmacOSのAutomatorで以下のshellを実行するアプリケーションを作成しています。
 
 ```sh
-nohup ~/bin/azoo-key-skkserv >&/dev/null &
+nohup ~/opt/azoo-key-skkserv/azoo-key-skkserv >&/dev/null &
 ```
 
 作成したアプリケーションはログイン項目に登録しておき、自動的にサーバーが立ち上がるようにしています。
