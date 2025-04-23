@@ -20,6 +20,7 @@ let convertOption = ConvertRequestOptions.withDefaultDictionary(
     sharedContainerURL: URL(fileURLWithPath: ""),
     zenzaiMode: .on(
         weight: Bundle.module.url(forResource: "zenz-v1", withExtension: "gguf")!,
+        inferenceLimit: 1,
         personalizationMode: nil,
         versionDependentMode: .v1
     ),
