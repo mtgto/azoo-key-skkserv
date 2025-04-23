@@ -1,10 +1,10 @@
 {
-  "originHash" : "35881b1a8baf1206dd0f64bc1db84f5a0ee180d9fb830c5f1975d35f53c94146",
+  "originHash" : "4c1f507a08212daf7f492592394f4c603f655e13f50497f1e3d59a6315d5f735",
   "pins" : [
     {
       "identity" : "azookeykanakanjiconverter",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/gitusp/AzooKeyKanaKanjiConverter",
+      "location" : "https://github.com/azooKey/AzooKeyKanaKanjiConverter",
       "state" : {
         "revision" : "2cde22d3e2dd67244f7b095e092f23892dd4d566"
       }
@@ -21,7 +21,7 @@
     {
       "identity" : "swift-algorithms",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-algorithms.git",
+      "location" : "https://github.com/apple/swift-algorithms",
       "state" : {
         "revision" : "87e50f483c54e6efd60e885f7f5aa946cee68023",
         "version" : "1.2.1"
@@ -30,7 +30,7 @@
     {
       "identity" : "swift-collections",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-collections.git",
+      "location" : "https://github.com/apple/swift-collections",
       "state" : {
         "revision" : "671108c96644956dddcd89dd59c203dcdb36cec7",
         "version" : "1.1.4"

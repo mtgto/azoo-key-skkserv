@@ -9,7 +9,7 @@ let package = Package(
         .macOS(.v14)
     ],
     dependencies: [
-        .package(url: "https://github.com/gitusp/AzooKeyKanaKanjiConverter", revision: "2cde22d3e2dd67244f7b095e092f23892dd4d566", traits: ["Zenzai"])
+        .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", revision: "2cde22d3e2dd67244f7b095e092f23892dd4d566", traits: ["Zenzai"])
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
