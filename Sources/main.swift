@@ -18,8 +18,16 @@ let convertOption = ConvertRequestOptions.withDefaultDictionary(
     // TODO: 扱いについて検討
     memoryDirectoryURL: URL(fileURLWithPath: ""),
     sharedContainerURL: URL(fileURLWithPath: ""),
+    zenzaiMode: .on(
+        weight: Bundle.module.url(forResource: "zenz-v1", withExtension: "gguf")!,
+        personalizationMode: nil,
+        versionDependentMode: .v1
+    ),
     metadata: .init(versionString: "0.0.1")
 )
+
+// NOTE: 空のリクエストを送信して辞書を先読みしておく
+let _ = converter.requestCandidates(ComposingText(), options: convertOption)
 
 func getPort() -> NWEndpoint.Port {
     if CommandLine.arguments.count == 2 {

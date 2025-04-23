@@ -1,17 +1,18 @@
 azoo-key-skkserv
 ===
 
-[AzooKeyKanaKanjiConverter](https://github.com/azooKey/AzooKeyKanaKanjiConverter)を変換に利用したskkservです。
+[AzooKeyKanaKanjiConverter](https://github.com/azooKey/AzooKeyKanaKanjiConverter)を変換に利用したskkservです。  
+ニューラルかな漢字変換システム「Zenzai」で利用するモデルは[zenz-v1](https://huggingface.co/Miwa-Keita/zenz-v1)を利用させていただいています。
 
 ## azoo-key-skkservについて
 
-受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を返します。  
+skkservとして受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を辞書として返します。  
 これにより例えば:
 
 - `配達業者` などそれぞれの熟語は辞書に入っているけれど、繋がったものは登録されていないケースでも候補を表示できます。
 - 送り仮名が不明瞭であったりする際、送り仮名ごと入力しても候補が表示されます。
-- SKKの流儀とは反しそうですが、形態素解析の力を借りて、文をそのまま変換するような使い方も可能です。
-    - SKKの仕様上ユーザー辞書にそのまま登録されてしまうので、その点はご注意ください。
+- SKKの流儀とは反しそうですが、Zenzaiの強力な変換力により、長文をそのまま変換することも可能です。
+    - SKKの仕様上ユーザー辞書にそのまま登録されてしまうと思うので、その点はご注意ください。
 
 ## インストール
 
@@ -41,7 +42,7 @@ azoo-key-skkserv [port]
 私はmacOSのAutomatorで以下のshellを実行するアプリケーションを作成しています。
 
 ```sh
-nohup azoo-key-skkserv >&/dev/null &
+nohup ~/bin/azoo-key-skkserv >&/dev/null &
 ```
 
 作成したアプリケーションはログイン項目に登録しておき、自動的にサーバーが立ち上がるようにしています。
@@ -78,12 +79,14 @@ swift run azoo-key-skkserve
 ## やりたいこと等
 
 - [x] PoC
+- [x] Zenzaiの導入
 - [ ] homebrew等でバイナリ配布
+- [ ] mac以外での動作確認やバイナリ配布
 - [ ] ネットワークサンドボックス
     - 見出し語の入力がどこにも送信されないことを保証したい
-    - SKKにはTCPで通信できる必要があり、リモートへの通信のみ制限することができるのか？
+    - SKKにはTCPで通信できる必要がある。リモートへの通信のみ制限することができるのか？
     - 詳しい方いたら教えてください🙏
-- [ ] 設定ファイルで挙動を変えられるように
-- [ ] Zenzaiの試験導入
-    - ビルド周りで手こずってしまって一旦ペンディング
-    - SKKで長文を食わせることもあまりないような気もするけれど、体験してみたい気もする。
+- [ ] 設定ファイルで挙動を変えられるように？
+    - 設定したいことがあれば
+    - 少しの項目であればコマンドライン引数でよさそう
+    - luaを実行できるようにしておけば、プログラマブルな補完とかもできて夢広がる
