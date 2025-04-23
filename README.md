@@ -4,6 +4,8 @@ azoo-key-skkserv
 [AzooKeyKanaKanjiConverter](https://github.com/azooKey/AzooKeyKanaKanjiConverter)を変換に利用したskkservです。  
 ニューラルかな漢字変換システム「Zenzai」で利用するモデルは[zenz-v1](https://huggingface.co/Miwa-Keita/zenz-v1)を利用させていただいています。
 
+zenz-v1はKeita Miwa ([𝕏](https://x.com/miwa_ensan))さんによって開発され、[CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.ja)で提供されています。
+
 ## azoo-key-skkservについて
 
 macOSで動作する、受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を辞書として返すskkservです。  
