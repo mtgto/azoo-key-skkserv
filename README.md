@@ -48,7 +48,8 @@ nohup ~/bin/azoo-key-skkserv >&/dev/null &
 
 ### 文字コード
 
-入力・出力どちらもEUC-JP
+入力: EUC-JP  
+出力: UTF-8
 
 ### プロトコル
 
