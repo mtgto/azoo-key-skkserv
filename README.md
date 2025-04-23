@@ -16,14 +16,14 @@ macOSで動作する、受け取った読みをAzooKeyKanaKanjiConverterで漢�
 
 ## インストール
 
-[Releases](https://github.com/gitusp/azoo-key-skkserv/releases)よりUniversal binaryをダウンロードしてください。  
+[Releases](https://github.com/gitusp/azoo-key-skkserv/releases)よりご自身のarchに対応したパッケージをダウンロードしてください。  
 その後、解凍されたパッケージをお好きなところに配置してください。
 
 私は以下のような感じでホームディレクトリ配下に置いています。
 
 ```sh
-cp -r ~/Downloads/azoo-key-skkserve-0.0.1 ~/opt/azoo-key-skkserve-0.0.1
-ln -s ~/opt/azoo-key-skkserve/azoo-key-skkserv-0.0.1 ~/bin/azoo-key-skkserv
+mv ~/Downloads/azoo-key-skkserve-arm64-0.0.1 ~/opt
+ln -s ~/opt/azoo-key-skkserve-arm64-0.0.1/azoo-key-skkserv ~/bin/azoo-key-skkserv
 ```
 
 ## 使い方
