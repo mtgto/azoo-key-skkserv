@@ -3,6 +3,18 @@
 
 import PackageDescription
 
+#if os(Linux) && arch(arm64)
+let linkerSettings = [
+    LinkerSetting.unsafeFlags(["-L", "./lib/arm64", "-Xlinker", "-rpath", "-Xlinker", "$ORIGIN/lib"])
+]
+#elseif os(Linux) && arch(x86_64)
+let linkerSettings = [
+    LinkerSetting.unsafeFlags(["-L", "./lib/x86_64", "-Xlinker", "-rpath", "-Xlinker", "$ORIGIN/lib"])
+]
+#else
+let linkerSettings: [LinkerSetting] = []
+#endif
+
 let package = Package(
     name: "azoo-key-skkserv",
     platforms: [
@@ -24,7 +36,8 @@ let package = Package(
             ],
             swiftSettings: [
                 .interoperabilityMode(.Cxx)
-            ]
+            ],
+            linkerSettings: linkerSettings
         )
     ]
 )
