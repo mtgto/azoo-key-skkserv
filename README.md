@@ -28,12 +28,7 @@ https://github.com/user-attachments/assets/614f87b9-062a-4710-92e2-f275eb80703f
 [Releases](https://github.com/gitusp/azoo-key-skkserv/releases)よりご自身のarchに対応したパッケージをダウンロードしてください。  
 その後、解凍されたパッケージをお好きなところに配置してください。
 
-私は以下のような感じでホームディレクトリ配下に置いています。
-
-```sh
-mv ~/Downloads/azoo-key-skkserve-arm64-0.0.2 ~/opt
-ln -s ~/opt/azoo-key-skkserve-arm64-0.0.2 ~/opt/azoo-key-skkserv
-```
+パッケージ内の `azoo-key-skkserv` が実行ファイルです。
 
 ## 使い方
 
@@ -81,7 +76,17 @@ swift run azoo-key-skkserve
 
 ## 動作検証環境
 
-[macSKK](https://github.com/mtgto/macSKK)
+### macOS(Apple silicon)
+
+[macSKK](https://github.com/mtgto/macSKK)と結合して動作確認
+
+### macOS(Intel)
+
+動作未確認
+
+### Ubuntu(arm64, x86)
+
+macOS上で動作するDockerにて、netcatで動作確認
 
 ## 免責
 
