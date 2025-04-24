@@ -6,6 +6,9 @@ AzooKeyKanaKanjiConverterから参照される、ニューラルかな漢字変�
 
 zenz-v1はKeita Miwa ([𝕏](https://x.com/miwa_ensan))さんによって開発され、[CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.ja)で提供されています。
 
+Linux環境向けのバイナリには[llama.cpp](https://github.com/ggml-org/llama.cpp)の[Shared Object](https://github.com/ggml-org/llama.cpp/releases/tag/b4846)を同梱させていただいております。  
+かつ `RUNPATH` を `$ORIGIN` にpatchさせていただいております。
+
 ## azoo-key-skkservについて
 
 macOSで動作する、受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を辞書として返すskkservです。  
@@ -25,12 +28,7 @@ https://github.com/user-attachments/assets/614f87b9-062a-4710-92e2-f275eb80703f
 [Releases](https://github.com/gitusp/azoo-key-skkserv/releases)よりご自身のarchに対応したパッケージをダウンロードしてください。  
 その後、解凍されたパッケージをお好きなところに配置してください。
 
-私は以下のような感じでホームディレクトリ配下に置いています。
-
-```sh
-mv ~/Downloads/azoo-key-skkserve-arm64-0.0.2 ~/opt
-ln -s ~/opt/azoo-key-skkserve-arm64-0.0.2 ~/opt/azoo-key-skkserv
-```
+パッケージ内の `azoo-key-skkserv` が実行ファイルです。
 
 ## 使い方
 
@@ -78,7 +76,17 @@ swift run azoo-key-skkserve
 
 ## 動作検証環境
 
-[macSKK](https://github.com/mtgto/macSKK)
+### macOS(Apple silicon)
+
+[macSKK](https://github.com/mtgto/macSKK)と結合して動作確認
+
+### macOS(Intel)
+
+動作未確認
+
+### Ubuntu(arm64, x86)
+
+macOS上で動作するDockerにて、netcatで動作確認
 
 ## 免責
 
@@ -89,7 +97,7 @@ swift run azoo-key-skkserve
 
 - [x] PoC
 - [x] Zenzaiの導入
-- [ ] linux向けビルド
+- [x] linux向けビルド
 - [ ] homebrewでバイナリ配布など
 - [ ] ネットワークサンドボックス
     - 見出し語の入力がどこにも送信されないことを保証したい
