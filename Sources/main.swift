@@ -1,8 +1,10 @@
 import Foundation
-import Network
+import NIOCore
+import NIOPosix
 import KanaKanjiConverterModuleWithDefaultDictionary
 
 // TODO: stderrに出力を分けたい
+let allocator = ByteBufferAllocator()
 
 let converter = KanaKanjiConverter()
 
@@ -27,124 +29,92 @@ let convertOption = ConvertRequestOptions.withDefaultDictionary(
     metadata: .init(versionString: "0.0.1")
 )
 
+let port = getPort()
+
 // HACK: ダミーリクエストを送信してモデルを先読みしておく
 var dummyComposingText = ComposingText()
 dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
 let _ = converter.requestCandidates(dummyComposingText, options: convertOption)
 
-func getPort() -> NWEndpoint.Port {
+// こちらのガイドを参考に実装した。
+// https://swiftonserver.com/using-swiftnio-channels/
+let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
+    .bind(
+        host: "127.0.0.1",
+        port: port
+    ) { channel in
+        channel.eventLoop.makeCompletedFuture {
+            return try NIOAsyncChannel(
+                wrappingChannelSynchronously: channel,
+                configuration: NIOAsyncChannel.Configuration(
+                    inboundType: ByteBuffer.self,
+                    outboundType: ByteBuffer.self
+                )
+            )
+        }
+    }
+
+try await withThrowingDiscardingTaskGroup { group in
+    try await server.executeThenClose { clients in
+        for try await client in clients {
+            group.addTask {
+                try await handleClient(client)
+            }
+        }
+    }
+}
+
+func handleClient(_ client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async throws {
+    try await client.executeThenClose { inboundMessages, outbound in
+        for try await inboundMessage in inboundMessages {
+            if let bytes = inboundMessage.getBytes(at: 0, length: inboundMessage.readableBytes),
+                let message = String(bytes: bytes, encoding: .japaneseEUC) {
+                let opcode = message.prefix(1)
+
+                switch (opcode) {
+                case "0":
+                    return
+                case "1":
+                    let yomi = String(message.suffix(message.count - 1)).trimmingCharacters(in: .whitespacesAndNewlines)
+                    var composingText = ComposingText()
+                    composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
+                    Task {
+                        let results = await converter.requestCandidates(composingText, options: convertOption)
+
+                        let content = results.mainResults.count == 0
+                            ? "4\n"
+                            : "1/"
+                                + results.mainResults
+                                    // 読み全文に対応するもの以外・読みと完全一致するものは除去
+                                    .filter({ result in result.correspondingCount == yomi.count && result.text != yomi })
+                                    .map({ result in result.text })
+                                    .joined(by: "/")
+                                + "/\n"
+
+                        try await outbound.write(allocator.buffer(string: content))
+                    }
+                case "2":
+                    try await outbound.write(allocator.buffer(string: "azoo-key-skkserve/0.1.0 "))
+                case "3":
+                    let host = Host.current().localizedName ?? ""
+                    try await outbound.write(allocator.buffer(string: host + "/127.0.0.1:" + String(port) + "/ "))
+                case "4":
+                    try await outbound.write(allocator.buffer(string: "4\n" ))
+                default:
+                    break;
+                }
+            }
+        }
+    }
+}
+
+func getPort() -> Int {
     if CommandLine.arguments.count == 2 {
-        if let port = NWEndpoint.Port(CommandLine.arguments[1]) {
+        if let port = Int(CommandLine.arguments[1]) {
             return port
         }
         print("Port argument is invalid. Falling back to default port.")
     }
 
-    return NWEndpoint.Port(1178)
-}
-
-func send(on connection: NWConnection, message: String) {
-    connection.send(content: message.data(using: .utf8), completion: .contentProcessed { sendError in
-        if let error = sendError {
-            print("Send error:", error)
-        }
-    })
-}
-
-func receive(on connection: NWConnection) {
-    connection.receive(minimumIncompleteLength: 1, maximumLength: 1024) { data, context, isComplete, error in
-        if let data = data, !data.isEmpty, let message = String(data: data, encoding: .japaneseEUC) {
-            print("Received: \(message)")
-
-            let opcode = message.prefix(1)
-
-            switch (opcode) {
-            case "0":
-                connection.cancel()
-            case "1":
-                let yomi = String(message.suffix(message.count - 1)).trimmingCharacters(in: .whitespacesAndNewlines)
-                var composingText = ComposingText()
-                composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
-                Task {
-                    let results = await converter.requestCandidates(composingText, options: convertOption)
-
-                    let content = results.mainResults.count == 0
-                        ? "4\n"
-                        : "1/"
-                            + results.mainResults
-                                // 読み全文に対応するもの以外・読みと完全一致するものは除去
-                                .filter({ result in result.correspondingCount == yomi.count && result.text != yomi })
-                                .map({ result in result.text })
-                                .joined(by: "/")
-                            + "/\n"
-
-                    send(on: connection, message: content)
-                }
-            case "2":
-                send(on: connection, message: "azoo-key-skkserve/0.0.1 ")
-            case "3":
-                let host = Host.current().localizedName ?? ""
-                send(on: connection, message: host + "/127.0.0.1:1178/ " )
-            case "4":
-                send(on: connection, message: "4\n" )
-            default:
-                break;
-            }
-        }
-        if let error = error {
-            print("Receive error:", error)
-            connection.cancel()
-        } else if isComplete {
-            print("Connection ended by remote")
-            connection.cancel()
-        } else {
-            receive(on: connection)
-        }
-    }
-}
-
-func handleConnection(_ connection: NWConnection) {
-    connection.stateUpdateHandler = { state in
-        switch state {
-        case .ready:
-            print("Client connected: \(connection.endpoint)")
-            receive(on: connection)
-        case .failed(let error):
-            print("Connection failed:", error)
-            connection.cancel()
-        case .cancelled:
-            print("Connection cancelled")
-        default:
-            break
-        }
-    }
-    connection.start(queue: .main)
-}
-
-do {
-    let port = getPort()
-    let listener = try NWListener(using: .tcp, on: port)
-
-    listener.newConnectionHandler = { connection in
-        print("Accepted new connection from \(connection.endpoint)")
-        handleConnection(connection)
-    }
-
-    listener.stateUpdateHandler = { state in
-        switch state {
-        case .ready:
-            print("Server listening on port \(port)")
-        case .failed(let error):
-            print("Listener failed:", error)
-            exit(EXIT_FAILURE)
-        default:
-            break
-        }
-    }
-
-    listener.start(queue: .main)
-    dispatchMain()
-} catch {
-    print("Failed to start listener:", error)
-    exit(EXIT_FAILURE)
+    return 1178
 }
