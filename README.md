@@ -6,6 +6,9 @@ AzooKeyKanaKanjiConverterから参照される、ニューラルかな漢字変�
 
 zenz-v1はKeita Miwa ([𝕏](https://x.com/miwa_ensan))さんによって開発され、[CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.ja)で提供されています。
 
+Linux環境向けのバイナリには[llama.cpp](https://github.com/ggml-org/llama.cpp)の[Shared Object](https://github.com/ggml-org/llama.cpp/releases/tag/b4846)を同梱させていただいております。  
+かつ `RUNPATH` を `$ORIGIN` にpatchさせていただいております。
+
 ## azoo-key-skkservについて
 
 macOSで動作する、受け取った読みをAzooKeyKanaKanjiConverterで漢字変換し、候補を辞書として返すskkservです。  
