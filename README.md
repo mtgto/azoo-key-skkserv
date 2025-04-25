@@ -52,7 +52,7 @@ _EUC-JP範囲外の候補があるため `--outgoing-charset` オプションは
 私はmacOSのAutomatorで以下のshellを実行するアプリケーションを作成しています。
 
 ```sh
-nohup ~/opt/azoo-key-skkserv/azoo-key-skkserv >&/dev/null &
+nohup ~/opt/azoo-key-skkserv/azoo-key-skkserv --incoming-charset EUC-JP >&/dev/null &
 ```
 
 作成したアプリケーションはログイン項目に登録しておき、自動的にサーバーが立ち上がるようにしています。
