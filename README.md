@@ -42,10 +42,10 @@ apt install libgomp1
 ## 使い方
 
 ```sh
-azoo-key-skkserv [port]
+azoo-key-skkserv [--port <port-number>] [--incoming-charset <charset>] [--help] [--version]
 ```
 
-`port` を指定しない場合、デフォルトの `1178` が使用されます。
+_EUC-JP範囲外の候補があるため `--outgoing-charset` オプションはなく、サーバーからは常にUTF-8で返します。_
 
 ### バックグラウンド実行
 
@@ -58,13 +58,6 @@ nohup ~/opt/azoo-key-skkserv/azoo-key-skkserv >&/dev/null &
 作成したアプリケーションはログイン項目に登録しておき、自動的にサーバーが立ち上がるようにしています。
 
 ## 仕様
-
-### 文字コード
-
-入力: EUC-JP  
-出力: UTF-8
-
-### プロトコル
 
 skkservの標準に準拠しているつもりです。  
 入力の1文字目を `opcode` とし、それ以降を `operand` とした場合:
@@ -107,6 +100,7 @@ macOS上で動作するDockerにて、netcatで動作確認
 - [x] PoC
 - [x] Zenzaiの導入
 - [x] linux向けビルド
+- [x] コマンドラインオプション
 - [ ] homebrewでバイナリ配布など
 - [ ] ネットワークサンドボックス
     - 見出し語の入力がどこにも送信されないことを保証したい
