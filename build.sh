@@ -12,6 +12,7 @@ echo "========="
 echo "clean all"
 echo "========="
 rm -rf .build/aarch64-unknown-linux-gnu* .build/arm64-apple-macosx* .build/x86_64-apple-macosx* .build/x86_64-unknown-linux-gnu*
+echo "done"
 
 # build
 echo "==========="
@@ -41,6 +42,7 @@ echo "cp libs"
 echo "======="
 cp -r lib/arm64 .build/aarch64-unknown-linux-gnu/release/lib
 cp -r lib/x86_64 .build/x86_64-unknown-linux-gnu/release/lib
+echo "done"
 
 # Then zip
 echo "======="
