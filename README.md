@@ -86,9 +86,13 @@ swift run azoo-key-skkserve
 
 動作未確認
 
-### Ubuntu(arm64, x86)
+### Ubuntu(arm64)
 
 macOS上で動作するDockerにて、netcatで動作確認
+
+### Ubuntu(amd64)
+
+一応コンパイルできていそうなのですが、エミュレータだとうまく実行できていません。
 
 ## 免責
 
