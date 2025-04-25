@@ -1,12 +1,14 @@
 import Foundation
+import ArgumentParser
 import NIOCore
 import NIOPosix
 import KanaKanjiConverterModuleWithDefaultDictionary
 
 // TODO: stderrに出力を分けたい
-let allocator = ByteBufferAllocator()
 
-let converter = KanaKanjiConverter()
+let version = "0.1.0"
+
+let allocator = ByteBufferAllocator()
 
 let convertOption = ConvertRequestOptions.withDefaultDictionary(
     // 日本語予測変換
@@ -26,49 +28,88 @@ let convertOption = ConvertRequestOptions.withDefaultDictionary(
         personalizationMode: nil,
         versionDependentMode: .v1
     ),
-    metadata: .init(versionString: "0.0.1")
+    metadata: .init(versionString: version)
 )
 
-let port = getPort()
+// 文字コードオプション
+enum IncomingCharset: String, ExpressibleByArgument, CaseIterable {
+    case utf8 = "UTF-8"
+    case eucjp = "EUC-JP"
 
-// HACK: ダミーリクエストを送信してモデルを先読みしておく
-var dummyComposingText = ComposingText()
-dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
-let _ = converter.requestCandidates(dummyComposingText, options: convertOption)
-
-// こちらのガイドを参考に実装した。
-// https://swiftonserver.com/using-swiftnio-channels/
-let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
-    .bind(
-        host: "127.0.0.1",
-        port: port
-    ) { channel in
-        channel.eventLoop.makeCompletedFuture {
-            return try NIOAsyncChannel(
-                wrappingChannelSynchronously: channel,
-                configuration: NIOAsyncChannel.Configuration(
-                    inboundType: ByteBuffer.self,
-                    outboundType: ByteBuffer.self
-                )
-            )
-        }
+    static var defaultCompletionKind: CompletionKind {
+        .list(IncomingCharset.allCases.map { $0.rawValue })
     }
 
-try await withThrowingDiscardingTaskGroup { group in
-    try await server.executeThenClose { clients in
-        for try await client in clients {
-            group.addTask {
-                try await handleClient(client)
-            }
+    var stringEncoding: String.Encoding {
+        switch self {
+            case .utf8: return .utf8
+            case .eucjp: return .japaneseEUC
         }
     }
 }
 
-func handleClient(_ client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async throws {
+struct AzooKeySkkserv: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        abstract: "A SKK server powered by AzooKeyKanaKanjiConverter",
+        version: version
+    )
+
+    @Option(help: "The network port number to use.")
+    var port: Int = 1178
+
+    @Option(help: "The expected incoming character set.")
+    var incomingCharset: IncomingCharset = .utf8
+
+    func run() throws {
+        Task {
+            // コンバータ初期化
+            let converter = await KanaKanjiConverter()
+
+            // HACK: ダミーリクエストを送信してモデルを先読みしておく
+            var dummyComposingText = ComposingText()
+            dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
+            let _ = await converter.requestCandidates(dummyComposingText, options: convertOption)
+
+            // こちらのガイドを参考に実装した。
+            // https://swiftonserver.com/using-swiftnio-channels/
+            let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
+                .bind(
+                    host: "127.0.0.1",
+                    port: port
+                ) { channel in
+                    channel.eventLoop.makeCompletedFuture {
+                        return try NIOAsyncChannel(
+                            wrappingChannelSynchronously: channel,
+                            configuration: NIOAsyncChannel.Configuration(
+                                inboundType: ByteBuffer.self,
+                                outboundType: ByteBuffer.self
+                            )
+                        )
+                    }
+                }
+
+            try await withThrowingDiscardingTaskGroup { group in
+                try await server.executeThenClose { clients in
+                    for try await client in clients {
+                        group.addTask {
+                            try await handleClient(context: self, converter: converter, client: client)
+                        }
+                    }
+                }
+            }
+        }
+
+        RunLoop.current.run()
+    }
+}
+
+AzooKeySkkserv.main()
+
+func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async throws {
     try await client.executeThenClose { inboundMessages, outbound in
         for try await inboundMessage in inboundMessages {
             if let bytes = inboundMessage.getBytes(at: 0, length: inboundMessage.readableBytes),
-                let message = String(bytes: bytes, encoding: .japaneseEUC) {
+                let message = String(bytes: bytes, encoding: context.incomingCharset.stringEncoding) {
                 let opcode = message.prefix(1)
 
                 switch (opcode) {
@@ -94,10 +135,10 @@ func handleClient(_ client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async throw
                         try await outbound.write(allocator.buffer(string: content))
                     }
                 case "2":
-                    try await outbound.write(allocator.buffer(string: "azoo-key-skkserve/0.1.0 "))
+                    try await outbound.write(allocator.buffer(string: "azoo-key-skkserve/" + version + " "))
                 case "3":
                     let host = Host.current().localizedName ?? ""
-                    try await outbound.write(allocator.buffer(string: host + "/127.0.0.1:" + String(port) + "/ "))
+                    try await outbound.write(allocator.buffer(string: host + "/127.0.0.1:" + String(context.port) + "/ "))
                 case "4":
                     try await outbound.write(allocator.buffer(string: "4\n" ))
                 default:
@@ -106,15 +147,4 @@ func handleClient(_ client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async throw
             }
         }
     }
-}
-
-func getPort() -> Int {
-    if CommandLine.arguments.count == 2 {
-        if let port = Int(CommandLine.arguments[1]) {
-            return port
-        }
-        print("Port argument is invalid. Falling back to default port.")
-    }
-
-    return 1178
 }
