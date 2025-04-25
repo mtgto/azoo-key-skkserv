@@ -5,11 +5,11 @@ import PackageDescription
 
 #if os(Linux) && arch(arm64)
 let linkerSettings = [
-    LinkerSetting.unsafeFlags(["-L", "./lib/arm64", "-Xlinker", "-rpath", "-Xlinker", "$ORIGIN/lib"])
+    LinkerSetting.unsafeFlags(["-L", "./lib/arm64", "-L", "/usr/lib/swift/linux", "-Xlinker", "-rpath", "-Xlinker", "$ORIGIN/lib"])
 ]
 #elseif os(Linux) && arch(x86_64)
 let linkerSettings = [
-    LinkerSetting.unsafeFlags(["-L", "./lib/x86_64", "-Xlinker", "-rpath", "-Xlinker", "$ORIGIN/lib"])
+    LinkerSetting.unsafeFlags(["-L", "./lib/x86_64", "-L", "/usr/lib/swift/linux", "-Xlinker", "-rpath", "-Xlinker", "$ORIGIN/lib"])
 ]
 #else
 let linkerSettings: [LinkerSetting] = []

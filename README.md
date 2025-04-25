@@ -30,6 +30,15 @@ https://github.com/user-attachments/assets/614f87b9-062a-4710-92e2-f275eb80703f
 
 パッケージ内の `azoo-key-skkserv` が実行ファイルです。
 
+### ダイナミックライブラリについて
+
+こちらのLinux検証環境だと `libgomp.so.1` が見つからないエラーが出ました。  
+もし見つからない場合は、以下のようなコマンドでインストールお願いします。
+
+```sh
+apt install libgomp1
+```
+
 ## 使い方
 
 ```sh
@@ -97,9 +106,7 @@ macOS上で動作するDockerにて、netcatで動作確認
 
 - [x] PoC
 - [x] Zenzaiの導入
-- [ ] linux向けビルド
-    - できたと思ったが、swiftのruntimeが入ってないと動かなかった。
-    - staticに含めるoptionあったが、指定するとビルドが通らなくなったので一旦リリースを取り下げ
+- [x] linux向けビルド
 - [ ] homebrewでバイナリ配布など
 - [ ] ネットワークサンドボックス
     - 見出し語の入力がどこにも送信されないことを保証したい

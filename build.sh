@@ -17,22 +17,23 @@ rm -rf .build/aarch64-unknown-linux-gnu* .build/arm64-apple-macosx* .build/x86_6
 echo "==========="
 echo "macOS arm64"
 echo "==========="
-swift build -c release --arch arm64 
+swift build -c release --arch arm64
 
 echo "============"
 echo "macOS x86_64"
 echo "============"
-swift build -c release --arch x86_64 
+swift build -c release --arch x86_64
 
 echo "==========="
 echo "Linux arm64"
 echo "==========="
-docker run --platform linux/arm64 -v "$PWD:/code" -w /code swift:latest swift build -c release
+docker run --platform linux/arm64 -v "$PWD:/code" -w /code swift:latest swift build -c release --static-swift-stdlib
 
 echo "==========="
 echo "Linux amd64"
 echo "==========="
-docker run --platform linux/amd64 -v "$PWD:/code" -w /code swift:latest swift build -c release
+# swift側のarch指定でコンパイルしたいが, そうするとビルド落ちるのでdockerのplatform自体をamd64にしている. ので遅い.
+docker run --platform linux/amd64 -v "$PWD:/code" -w /code swift:latest swift build -c release --static-swift-stdlib
 
 # cp libs
 echo "======="
