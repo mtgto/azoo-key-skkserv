@@ -116,7 +116,8 @@ func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client
                 case "0":
                     return
                 case "1":
-                    let yomi = String(message.suffix(message.count - 1)).trimmingCharacters(in: .whitespacesAndNewlines)
+                    var yomi = String(message.suffix(message.count - 1)).trimmingCharacters(in: .whitespacesAndNewlines)
+                    yomi.replace(/[a-z]$/, with: "")
                     var composingText = ComposingText()
                     composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
                     Task {
