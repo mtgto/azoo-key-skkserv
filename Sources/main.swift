@@ -62,40 +62,45 @@ struct AzooKeySkkserv: ParsableCommand {
 
     func run() throws {
         Task {
-            // コンバータ初期化
-            let converter = await KanaKanjiConverter()
+            do {
+                // コンバータ初期化
+                let converter = await KanaKanjiConverter()
 
-            // HACK: ダミーリクエストを送信してモデルを先読みしておく
-            var dummyComposingText = ComposingText()
-            dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
-            let _ = await converter.requestCandidates(dummyComposingText, options: convertOption)
+                // HACK: ダミーリクエストを送信してモデルを先読みしておく
+                var dummyComposingText = ComposingText()
+                dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
+                let _ = await converter.requestCandidates(dummyComposingText, options: convertOption)
 
-            // こちらのガイドを参考に実装した。
-            // https://swiftonserver.com/using-swiftnio-channels/
-            let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
-                .bind(
-                    host: "127.0.0.1",
-                    port: port
-                ) { channel in
-                    channel.eventLoop.makeCompletedFuture {
-                        return try NIOAsyncChannel(
-                            wrappingChannelSynchronously: channel,
-                            configuration: NIOAsyncChannel.Configuration(
-                                inboundType: ByteBuffer.self,
-                                outboundType: ByteBuffer.self
+                // こちらのガイドを参考に実装した。
+                // https://swiftonserver.com/using-swiftnio-channels/
+                let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
+                    .bind(
+                        host: "127.0.0.1",
+                        port: port
+                    ) { channel in
+                        channel.eventLoop.makeCompletedFuture {
+                            return try NIOAsyncChannel(
+                                wrappingChannelSynchronously: channel,
+                                configuration: NIOAsyncChannel.Configuration(
+                                    inboundType: ByteBuffer.self,
+                                    outboundType: ByteBuffer.self
+                                )
                             )
-                        )
+                        }
                     }
-                }
 
-            try await withThrowingDiscardingTaskGroup { group in
-                try await server.executeThenClose { clients in
-                    for try await client in clients {
-                        group.addTask {
-                            try await handleClient(context: self, converter: converter, client: client)
+                try await withThrowingDiscardingTaskGroup { group in
+                    try await server.executeThenClose { clients in
+                        for try await client in clients {
+                            group.addTask {
+                                try await handleClient(context: self, converter: converter, client: client)
+                            }
                         }
                     }
                 }
+            } catch let error {
+                print("An error occured: \(error)")
+                abort()
             }
         }
 
