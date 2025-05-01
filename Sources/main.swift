@@ -104,7 +104,7 @@ struct AzooKeySkkserv: ParsableCommand {
             }
         }
 
-        RunLoop.current.run()
+        dispatchMain()
     }
 }
 
