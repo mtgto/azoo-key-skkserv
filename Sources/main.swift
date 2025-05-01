@@ -31,6 +31,34 @@ let convertOption = ConvertRequestOptions.withDefaultDictionary(
     metadata: .init(versionString: version)
 )
 
+struct AzooKeySkkserv: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        abstract: "A SKK server powered by AzooKeyKanaKanjiConverter",
+        version: version
+    )
+
+    @Option(help: "The network port number to use.")
+    var port: Int = 1178
+
+    @Option(help: "The expected incoming character set.")
+    var incomingCharset: IncomingCharset = .utf8
+
+    func run() throws {
+        Task {
+            do {
+                try await runServer(context: self)
+            } catch let error {
+                print("An error occured: \(error)")
+                abort()
+            }
+        }
+
+        dispatchMain()
+    }
+}
+
+AzooKeySkkserv.main()
+
 // 文字コードオプション
 enum IncomingCharset: String, ExpressibleByArgument, CaseIterable {
     case utf8 = "UTF-8"
@@ -48,67 +76,43 @@ enum IncomingCharset: String, ExpressibleByArgument, CaseIterable {
     }
 }
 
-struct AzooKeySkkserv: ParsableCommand {
-    static let configuration = CommandConfiguration(
-        abstract: "A SKK server powered by AzooKeyKanaKanjiConverter",
-        version: version
-    )
+func runServer(context: AzooKeySkkserv) async throws {
+    // コンバータ初期化
+    let converter = await KanaKanjiConverter()
 
-    @Option(help: "The network port number to use.")
-    var port: Int = 1178
+    // HACK: ダミーリクエストを送信してモデルを先読みしておく
+    var dummyComposingText = ComposingText()
+    dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
+    let _ = await converter.requestCandidates(dummyComposingText, options: convertOption)
 
-    @Option(help: "The expected incoming character set.")
-    var incomingCharset: IncomingCharset = .utf8
-
-    func run() throws {
-        Task {
-            do {
-                // コンバータ初期化
-                let converter = await KanaKanjiConverter()
-
-                // HACK: ダミーリクエストを送信してモデルを先読みしておく
-                var dummyComposingText = ComposingText()
-                dummyComposingText.insertAtCursorPosition("もでるさきよみ", inputStyle: .direct)
-                let _ = await converter.requestCandidates(dummyComposingText, options: convertOption)
-
-                // こちらのガイドを参考に実装した。
-                // https://swiftonserver.com/using-swiftnio-channels/
-                let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
-                    .bind(
-                        host: "127.0.0.1",
-                        port: port
-                    ) { channel in
-                        channel.eventLoop.makeCompletedFuture {
-                            return try NIOAsyncChannel(
-                                wrappingChannelSynchronously: channel,
-                                configuration: NIOAsyncChannel.Configuration(
-                                    inboundType: ByteBuffer.self,
-                                    outboundType: ByteBuffer.self
-                                )
-                            )
-                        }
-                    }
-
-                try await withThrowingDiscardingTaskGroup { group in
-                    try await server.executeThenClose { clients in
-                        for try await client in clients {
-                            group.addTask {
-                                try await handleClient(context: self, converter: converter, client: client)
-                            }
-                        }
-                    }
-                }
-            } catch let error {
-                print("An error occured: \(error)")
-                abort()
+    // こちらのガイドを参考に実装した。
+    // https://swiftonserver.com/using-swiftnio-channels/
+    let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
+        .bind(
+            host: "127.0.0.1",
+            port: context.port
+        ) { channel in
+            channel.eventLoop.makeCompletedFuture {
+                return try NIOAsyncChannel(
+                    wrappingChannelSynchronously: channel,
+                    configuration: NIOAsyncChannel.Configuration(
+                        inboundType: ByteBuffer.self,
+                        outboundType: ByteBuffer.self
+                    )
+                )
             }
         }
 
-        dispatchMain()
+    try await withThrowingDiscardingTaskGroup { group in
+        try await server.executeThenClose { clients in
+            for try await client in clients {
+                group.addTask {
+                    try await handleClient(context: context, converter: converter, client: client)
+                }
+            }
+        }
     }
 }
-
-AzooKeySkkserv.main()
 
 func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async throws {
     try await client.executeThenClose { inboundMessages, outbound in
