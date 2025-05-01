@@ -125,21 +125,17 @@ func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client
                     yomi.replace(/[a-z]$/, with: "")
                     var composingText = ComposingText()
                     composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
-                    Task {
-                        let results = await converter.requestCandidates(composingText, options: convertOption)
-
-                        let content = results.mainResults.count == 0
-                            ? "4\n"
-                            : "1/"
-                                + results.mainResults
-                                    // 読み全文に対応するもの以外・読みと完全一致するものは除去
-                                    .filter({ result in result.correspondingCount == yomi.count && result.text != yomi })
-                                    .map({ result in result.text })
-                                    .joined(by: "/")
-                                + "/\n"
-
-                        try await outbound.write(allocator.buffer(string: content))
-                    }
+                    let results = await converter.requestCandidates(composingText, options: convertOption)
+                    let content = results.mainResults.count == 0
+                        ? "4\n"
+                        : "1/"
+                            + results.mainResults
+                                // 読み全文に対応するもの以外・読みと完全一致するものは除去
+                                .filter({ result in result.correspondingCount == yomi.count && result.text != yomi })
+                                .map({ result in result.text })
+                                .joined(by: "/")
+                            + "/\n"
+                    try await outbound.write(allocator.buffer(string: content))
                 case "2":
                     try await outbound.write(allocator.buffer(string: "azoo-key-skkserve/" + version + " "))
                 case "3":
