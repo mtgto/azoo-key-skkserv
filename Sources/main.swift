@@ -3,8 +3,10 @@ import ArgumentParser
 import NIOCore
 import NIOPosix
 import KanaKanjiConverterModuleWithDefaultDictionary
+import Logging
 
-// TODO: stderrに出力を分けたい
+LoggingSystem.bootstrap(StreamLogHandler.standardError)
+let logger = Logger(label: "io.github.gitusp.azoo-key-skkserv")
 
 let version = "0.1.0"
 
@@ -48,7 +50,7 @@ struct AzooKeySkkserv: ParsableCommand {
             do {
                 try await runServer(context: self)
             } catch let error {
-                print("An error occured: \(error)")
+                logger.error("An error occurred: \(error)")
                 abort()
             }
         }
@@ -102,6 +104,7 @@ func runServer(context: AzooKeySkkserv) async throws {
                 )
             }
         }
+    logger.notice("Server started on port \(context.port) with incoming charset \(context.incomingCharset.rawValue).")
 
     try await withThrowingDiscardingTaskGroup { group in
         try await server.executeThenClose { clients in
@@ -149,7 +152,7 @@ func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client
                 case "4":
                     try await outbound.write(allocator.buffer(string: "4\n" ))
                 default:
-                    break;
+                    break
                 }
             }
         }
