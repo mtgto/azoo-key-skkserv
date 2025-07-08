@@ -110,51 +110,58 @@ func runServer(context: AzooKeySkkserv) async throws {
         try await server.executeThenClose { clients in
             for try await client in clients {
                 group.addTask {
-                    try await handleClient(context: context, converter: converter, client: client)
+                    await handleClient(context: context, converter: converter, client: client)
                 }
             }
         }
     }
 }
 
-func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async throws {
-    try await client.executeThenClose { inboundMessages, outbound in
-        for try await inboundMessage in inboundMessages {
-            if let bytes = inboundMessage.getBytes(at: 0, length: inboundMessage.readableBytes),
-                let message = String(bytes: bytes, encoding: context.incomingCharset.stringEncoding) {
-                let opcode = message.prefix(1)
+func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client: NIOAsyncChannel<ByteBuffer, ByteBuffer>) async {
+    // クライアントが先にソケットを閉じている状態でソケットへの書き込みを行ったりすると例外が発生し、
+    // そのあとの接続でinboundMessagesからメッセージが取得できなくなってしまう。
+    // それを防ぐため例外をキャッチする必要がある。
+    do {
+        try await client.executeThenClose { inboundMessages, outbound in
+            for try await inboundMessage in inboundMessages {
+                if let bytes = inboundMessage.getBytes(at: 0, length: inboundMessage.readableBytes),
+                    let message = String(bytes: bytes, encoding: context.incomingCharset.stringEncoding) {
+                    let opcode = message.prefix(1)
 
-                switch (opcode) {
-                case "0":
-                    return
-                case "1":
-                    let yomi = String(message.suffix(message.count - 1))
-                        .trimmingCharacters(in: .whitespacesAndNewlines)
-                        .replacing(/([ぁ-ん])[a-z]$/) { matches in matches.1 }
-                    var composingText = ComposingText()
-                    composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
-                    let results = await converter.requestCandidates(composingText, options: convertOption)
-                    let content = results.mainResults.count == 0
-                        ? "4\n"
-                        : "1/"
-                            + results.mainResults
-                                // 読み全文に対応するもの以外・読みと完全一致するものは除去
-                                .filter({ result in result.correspondingCount == yomi.count && result.text != yomi })
-                                .map({ result in result.text })
-                                .joined(by: "/")
-                            + "/\n"
-                    try await outbound.write(allocator.buffer(string: content))
-                case "2":
-                    try await outbound.write(allocator.buffer(string: "azoo-key-skkserve/" + version + " "))
-                case "3":
-                    let host = Host.current().localizedName ?? ""
-                    try await outbound.write(allocator.buffer(string: host + "/127.0.0.1:" + String(context.port) + "/ "))
-                case "4":
-                    try await outbound.write(allocator.buffer(string: "4\n" ))
-                default:
-                    break
+                    switch (opcode) {
+                    case "0":
+                        return
+                    case "1":
+                        let yomi = String(message.suffix(message.count - 1))
+                            .trimmingCharacters(in: .whitespacesAndNewlines)
+                            .replacing(/([ぁ-ん])[a-z]$/) { matches in matches.1 }
+                        var composingText = ComposingText()
+                        composingText.insertAtCursorPosition(yomi, inputStyle: .direct)
+                        let results = await converter.requestCandidates(composingText, options: convertOption)
+                        let content = results.mainResults.count == 0
+                            ? "4\n"
+                            : "1/"
+                                + results.mainResults
+                                    // 読み全文に対応するもの以外・読みと完全一致するものは除去
+                                    .filter({ result in result.correspondingCount == yomi.count && result.text != yomi })
+                                    .map({ result in result.text })
+                                    .joined(by: "/")
+                                + "/\n"
+                        try await outbound.write(allocator.buffer(string: content))
+                    case "2":
+                        try await outbound.write(allocator.buffer(string: "azoo-key-skkserve/" + version + " "))
+                    case "3":
+                        let host = Host.current().localizedName ?? ""
+                        try await outbound.write(allocator.buffer(string: host + "/127.0.0.1:" + String(context.port) + "/ "))
+                    case "4":
+                        try await outbound.write(allocator.buffer(string: "4\n" ))
+                    default:
+                        break
+                    }
                 }
             }
         }
+    } catch {
+        logger.warning("Hit error: \(error)")
     }
 }
