@@ -23,7 +23,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/azooKey/AzooKeyKanaKanjiConverter", revision: "2cde22d3e2dd67244f7b095e092f23892dd4d566", traits: ["Zenzai"]),
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0")
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.3.0"),
+        .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -34,7 +35,8 @@ let package = Package(
                 .product(name: "KanaKanjiConverterModuleWithDefaultDictionary", package: "AzooKeyKanaKanjiConverter"),
                 .product(name: "NIOCore", package: "swift-nio"),
                 .product(name: "NIOPosix", package: "swift-nio"),
-                .product(name: "ArgumentParser", package: "swift-argument-parser")
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "Logging", package: "swift-log"),
             ],
             resources: [
                 .copy("zenz-v1.gguf")
