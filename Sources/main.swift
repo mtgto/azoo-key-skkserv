@@ -78,6 +78,26 @@ enum IncomingCharset: String, ExpressibleByArgument, CaseIterable {
     }
 }
 
+/**
+ * SKKServを起動する。
+ *
+ * Taskの中でrunServerを実行しTask.cancel()を呼び出すことでサーバーを停止できる。
+ *
+ * ```swift
+ * // SKKServを起動
+ * let task = Task {
+ *     do {
+ *         try await runServer(context: context)
+ *     } catch is CancellationError {
+ *         // タスクがキャンセルされたとき
+ *     } catch {
+ *         // その他のエラーが発生したとき
+ *     }
+ * }
+ * // SKKServを停止
+ * task.cancel()
+ * ```
+ */
 func runServer(context: AzooKeySkkserv) async throws {
     // コンバータ初期化
     let converter = await KanaKanjiConverter()
@@ -107,12 +127,17 @@ func runServer(context: AzooKeySkkserv) async throws {
     logger.notice("Server started on port \(context.port) with incoming charset \(context.incomingCharset.rawValue).")
 
     try await withThrowingDiscardingTaskGroup { group in
-        try await server.executeThenClose { clients in
-            for try await client in clients {
-                group.addTask {
-                    await handleClient(context: context, converter: converter, client: client)
+        try await withTaskCancellationHandler {
+            try await server.executeThenClose { clients in
+                for try await client in clients {
+                    group.addTask {
+                        await handleClient(context: context, converter: converter, client: client)
+                    }
                 }
             }
+        } onCancel: {
+            logger.notice("Server is shutting down.")
+            server.channel.close(mode: .input, promise: nil)
         }
     }
 }
