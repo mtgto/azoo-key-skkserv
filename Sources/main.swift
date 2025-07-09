@@ -174,13 +174,14 @@ func handleClient(context: AzooKeySkkserv, converter: KanaKanjiConverter, client
                                 + "/\n"
                         try await outbound.write(allocator.buffer(string: content))
                     case "2":
-                        try await outbound.write(allocator.buffer(string: "azoo-key-skkserve/" + version + " "))
+                        try await outbound.write(allocator.buffer(string: "azoo-key-skkserv/" + version + " "))
                     case "3":
                         let host = Host.current().localizedName ?? ""
-                        try await outbound.write(allocator.buffer(string: host + "/127.0.0.1:" + String(context.port) + "/ "))
+                        try await outbound.write(allocator.buffer(string: "\(host)/127.0.0.1:\(context.port)/ "))
                     case "4":
                         try await outbound.write(allocator.buffer(string: "4\n" ))
                     default:
+                        logger.warning("Unsupported opcode: \(opcode)")
                         break
                     }
                 }
