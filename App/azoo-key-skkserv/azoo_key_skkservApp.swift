@@ -1,9 +1,4 @@
-//
-//  azoo_key_skkservApp.swift
-//  azoo-key-skkserv
-//
-//  Created by mtgto on 2025/07/11.
-//
+// SPDX-License-Identifier: MIT
 
 import SwiftUI
 
