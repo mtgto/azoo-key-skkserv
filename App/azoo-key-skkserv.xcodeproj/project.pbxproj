@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CE4023BC2E20149F0034FB8F /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = CE4023BB2E20149F0034FB8F /* Core */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		CE4023A42E2013BF0034FB8F /* azoo-key-skkserv.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "azoo-key-skkserv.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE4023BC2E20149F0034FB8F /* Core in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = "azoo-key-skkserv";
 			packageProductDependencies = (
+				CE4023BB2E20149F0034FB8F /* Core */,
 			);
 			productName = "azoo-key-skkserv";
 			productReference = CE4023A42E2013BF0034FB8F /* azoo-key-skkserv.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = CE40239B2E2013BF0034FB8F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CE4023BA2E20149F0034FB8F /* XCLocalSwiftPackageReference "../Core" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE4023A52E2013BF0034FB8F /* Products */;
 			projectDirPath = "";
@@ -317,6 +326,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CE4023BA2E20149F0034FB8F /* XCLocalSwiftPackageReference "../Core" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Core;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CE4023BB2E20149F0034FB8F /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Core;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CE40239C2E2013BF0034FB8F /* Project object */;
 }
