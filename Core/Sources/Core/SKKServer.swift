@@ -88,17 +88,12 @@ import Logging
         logger.notice("Server started on port \(port) with incoming charset \(incomingCharset.rawValue).")
 
         try await withThrowingDiscardingTaskGroup { group in
-            try await withTaskCancellationHandler {
-                try await server.executeThenClose { clients in
-                    for try await client in clients {
-                        group.addTask {
-                            await handleClient(client: client, host: host, port: port, incomingCharset: incomingCharset)
-                        }
+            try await server.executeThenClose { clients in
+                for try await client in clients {
+                    group.addTask {
+                        await handleClient(client: client, host: host, port: port, incomingCharset: incomingCharset)
                     }
                 }
-            } onCancel: {
-                logger.notice("Server is shutting down.")
-                server.channel.close(mode: .input, promise: nil)
             }
         }
     }
