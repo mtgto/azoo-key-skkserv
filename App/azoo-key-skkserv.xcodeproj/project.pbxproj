@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		CE4023BC2E20149F0034FB8F /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = CE4023BB2E20149F0034FB8F /* Core */; };
+		CEA253902E212F2500618E64 /* LoggingOSLog in Frameworks */ = {isa = PBXBuildFile; productRef = CEA2538F2E212F2500618E64 /* LoggingOSLog */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CE4023BC2E20149F0034FB8F /* Core in Frameworks */,
+				CEA253902E212F2500618E64 /* LoggingOSLog in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +73,7 @@
 			name = "azoo-key-skkserv";
 			packageProductDependencies = (
 				CE4023BB2E20149F0034FB8F /* Core */,
+				CEA2538F2E212F2500618E64 /* LoggingOSLog */,
 			);
 			productName = "azoo-key-skkserv";
 			productReference = CE4023A42E2013BF0034FB8F /* azoo-key-skkserv.app */;
@@ -102,6 +105,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				CE4023BA2E20149F0034FB8F /* XCLocalSwiftPackageReference "../Core" */,
+				CEA2538E2E212F2500618E64 /* XCRemoteSwiftPackageReference "swift-log-oslog" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE4023A52E2013BF0034FB8F /* Products */;
@@ -336,10 +340,26 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		CEA2538E2E212F2500618E64 /* XCRemoteSwiftPackageReference "swift-log-oslog" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/chrisaljoudi/swift-log-oslog.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.2.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		CE4023BB2E20149F0034FB8F /* Core */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Core;
+		};
+		CEA2538F2E212F2500618E64 /* LoggingOSLog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CEA2538E2E212F2500618E64 /* XCRemoteSwiftPackageReference "swift-log-oslog" */;
+			productName = LoggingOSLog;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

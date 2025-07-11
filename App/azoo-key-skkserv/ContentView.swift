@@ -9,16 +9,21 @@ struct ContentView: View {
     @State var port: Int = 1178
     @State var incomingCharset: IncomingCharset = .utf8
     @State var running: Bool = false
-    @State private var serverTask: Task<Void, Error>? = nil
-    @State private var showingAlert: Bool = false
-    @State private var errorMessage: String = ""
-    let server = SKKServer(version: "0.1.0", logger: Logger(label: "io.github.gitusp.azoo-key-skkserv"))
-    private let formatter: NumberFormatter = {
+    @State var serverTask: Task<Void, Error>? = nil
+    @State var showingAlert: Bool = false
+    @State var errorMessage: String = ""
+    let logger = Logger(label: "io.github.gitusp.azoo-key-skkserv")
+    let server: SKKServer
+    let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.minimum = 1
         formatter.maximum = 65535
         return formatter
     }()
+
+    init() {
+        server = SKKServer(version: "0.1.0", logger: logger)
+    }
 
     var body: some View {
         VStack {
@@ -40,10 +45,10 @@ struct ContentView: View {
                             try await server.run(host: host, port: port, incomingCharset: incomingCharset.stringEncoding)
                         } catch is CancellationError {
                             // キャンセルが正常に完了した
-                            print("Server task was cancelled.")
+                            logger.notice("Server task was cancelled.")
                         } catch {
                             // キャンセル以外のエラーが発生した場合はアラートを表示する
-                            print("Server task error: \(error)")
+                            logger.error("Server task error: \(error)")
                             errorMessage = error.localizedDescription
                             showingAlert = true
                         }
