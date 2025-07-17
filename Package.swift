@@ -46,6 +46,7 @@ let package = Package(
             swiftSettings: [
                 .interoperabilityMode(.Cxx)
             ],
+            linkerSettings: linkerSettings
         )
     ]
 )
