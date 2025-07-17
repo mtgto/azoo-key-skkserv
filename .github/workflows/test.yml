@@ -32,5 +32,4 @@ jobs:
       name: Run tests
       run: swift test 2>&1 | xcbeautify
     - if: startsWith(matrix.os, 'ubuntu')
-      name: Run tests
-      run: swift test
+      run: LD_LIBRARY_PATH="$PWD/lib/x86_64:$LD_LIBRARY_PATH" swift test
