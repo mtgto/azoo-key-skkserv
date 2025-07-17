@@ -21,13 +21,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-14]
-        # os: [macos-14, macos-15, ubuntu-22.04, ubuntu-24.04]
+        os: [macos-15]
+        # os: [macos-15, ubuntu-22.04, ubuntu-24.04]
 
     steps:
     - uses: actions/checkout@v4
-    - if: matrix.os == 'macos-14'
-      run: sudo xcode-select -s '/Applications/Xcode_16.2.app/Contents/Developer'
     - if: matrix.os == 'macos-15'
       run: sudo xcode-select -s '/Applications/Xcode_16.4.app/Contents/Developer'
     - name: Run tests
