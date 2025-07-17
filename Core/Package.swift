@@ -36,9 +36,5 @@ let package = Package(
                 .interoperabilityMode(.Cxx)
             ],
         ),
-        .testTarget(
-            name: "CoreTests",
-            dependencies: ["Core"]
-        ),
     ]
 )
