@@ -5,9 +5,9 @@ import Core
 import Logging
 
 struct ContentView: View {
-    @State var host: String = "127.0.0.1"
-    @State var port: Int = 1178
-    @State var incomingCharset: IncomingCharset = .utf8
+    @AppStorage("host") var host: String = "127.0.0.1"
+    @AppStorage("port") var port: Int = 1178
+    @AppStorage("incomingCharset") var incomingCharset: IncomingCharset = .utf8
     @State var running: Bool = false
     @State var serverTask: Task<Void, Error>? = nil
     @State var showingAlert: Bool = false
