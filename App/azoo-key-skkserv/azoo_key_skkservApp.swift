@@ -15,5 +15,6 @@ struct azoo_key_skkservApp: App {
             ContentView()
                 .frame(width: 320, height: 180)
         }
+        .windowResizability(.contentSize)
     }
 }
