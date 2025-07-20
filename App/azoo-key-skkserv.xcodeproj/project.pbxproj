@@ -104,8 +104,8 @@
 			mainGroup = CE40239B2E2013BF0034FB8F;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				CE4023BA2E20149F0034FB8F /* XCLocalSwiftPackageReference "../Core" */,
 				CEA2538E2E212F2500618E64 /* XCRemoteSwiftPackageReference "swift-log-oslog" */,
+				CE4023BA2E20149F0034FB8F /* XCLocalSwiftPackageReference "../Core" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE4023A52E2013BF0034FB8F /* Products */;
@@ -265,6 +265,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -292,6 +293,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
