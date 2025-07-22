@@ -37,6 +37,16 @@ let package = Package(
                 .interoperabilityMode(.Cxx)
             ],
             linkerSettings: linkerSettings
+        ),
+        .testTarget(
+            name: "CoreTests",
+            dependencies: [
+                .product(name: "Core", package: "Core"),
+            ],
+            swiftSettings: [
+                .interoperabilityMode(.Cxx)
+            ],
+            linkerSettings: linkerSettings
         )
     ]
 )
