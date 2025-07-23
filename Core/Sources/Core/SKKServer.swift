@@ -71,6 +71,7 @@ import Logging
         // こちらのガイドを参考に実装した。
         // https://swiftonserver.com/using-swiftnio-channels/
         let server = try await ServerBootstrap(group: NIOSingletons.posixEventLoopGroup)
+            .serverChannelOption(.socketOption(.so_reuseaddr), value: 1)
             .bind(
                 host: host,
                 port: port
