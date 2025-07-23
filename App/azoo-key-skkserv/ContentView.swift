@@ -8,6 +8,7 @@ struct ContentView: View {
     @AppStorage("host") var host: String = "127.0.0.1"
     @AppStorage("port") var port: Int = 1178
     @AppStorage("incomingCharset") var incomingCharset: IncomingCharset = .utf8
+    @AppStorage("startServerAtLaunch") var startServerAtLaunch: Bool = false
     @State var running: Bool = false
     @State var serverTask: Task<Void, Error>? = nil
     @State var showingAlert: Bool = false
@@ -34,27 +35,9 @@ struct ContentView: View {
                     }
                 }
                 .disabled(running)
+                Toggle("Start Server At Launch", isOn: $startServerAtLaunch)
                 Button("Start Server") {
-                    running = true
-                    serverTask = Task {
-                        do {
-                            if server == nil {
-                                server = SKKServer(version: "0.1.0", logger: logger)
-                                server?.prepare()
-                            }
-                            try await server!.run(host: host, port: port, incomingCharset: incomingCharset.stringEncoding)
-                        } catch is CancellationError {
-                            // キャンセルが正常に完了した
-                            logger.notice("Server task was cancelled.")
-                        } catch {
-                            // キャンセル以外のエラーが発生した場合はアラートを表示する
-                            logger.error("Server task error: \(error)")
-                            errorMessage = error.localizedDescription
-                            showingAlert = true
-                        }
-                        running = false
-                        serverTask = nil
-                    }
+                    startServer()
                 }
                 .disabled(running)
                 Button("Stop Server") {
@@ -64,10 +47,38 @@ struct ContentView: View {
             }
         }
         .padding()
+        .onAppear {
+            if startServerAtLaunch {
+                startServer()
+            }
+        }
         .alert("Error", isPresented: $showingAlert) {
             Button("OK") { }
         } message: {
             Text(errorMessage)
+        }
+    }
+
+    func startServer() {
+        running = true
+        serverTask = Task {
+            do {
+                if server == nil {
+                    server = SKKServer(version: "0.1.0", logger: logger)
+                    server?.prepare()
+                }
+                try await server!.run(host: host, port: port, incomingCharset: incomingCharset.stringEncoding)
+            } catch is CancellationError {
+                // キャンセルが正常に完了した
+                logger.notice("Server task was cancelled.")
+            } catch {
+                // キャンセル以外のエラーが発生した場合はアラートを表示する
+                logger.error("Server task error: \(error)")
+                errorMessage = error.localizedDescription
+                showingAlert = true
+            }
+            running = false
+            serverTask = nil
         }
     }
 }
